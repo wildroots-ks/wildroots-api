@@ -25,6 +25,7 @@ app.use(express.urlencoded({ extended: true }));
 // Routes
 app.use('/api/public', require('./routes/public'));
 app.use('/api/registrations', require('./routes/registrations'));
+console.log('✅ Registrations route registered at /api/registrations');
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/admin', require('./routes/admin'));
 
