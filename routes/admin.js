@@ -228,7 +228,13 @@ router.post('/classes', async (req, res) => {
 // PUT /api/admin/classes/:id
 router.put('/classes/:id', async (req, res) => {
   try {
-    const classItem = await Class.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    // If slug hasn't changed, remove it from update to avoid duplicate key error
+    const existingClass = await Class.findById(req.params.id);
+    if (existingClass && existingClass.slug === req.body.slug) {
+      delete req.body.slug;
+    }
+    
+    const classItem = await Class.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
     
     if (!classItem) {
       return res.status(404).json({ 
