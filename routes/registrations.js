@@ -30,5 +30,7 @@ router.post('/', async (req, res) => {
     res.status(500).json({ success: false, error: error.message });
   }
 });
-
+router.get('/test', (req, res) => {
+  res.json({ success: true, message: 'GET route works!' });
+});
 module.exports = router;
