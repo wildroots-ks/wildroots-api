@@ -137,6 +137,14 @@ router.post('/classes/register', async (req, res) => {
       });
     }
     
+    // TEST endpoint
+    router.post('/test', (req, res) => {
+      res.json({ success: true, message: 'POST works!' });
+    });
+
+    // POST /api/public/classes/register
+    router.post('/classes/register', async (req, res) => {
+    
     // Save the registration
     const registration = await Registration.create({
       classId,
