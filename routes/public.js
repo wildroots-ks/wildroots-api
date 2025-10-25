@@ -56,7 +56,7 @@ router.get('/classes', async (req, res) => {
     res.status(500).json({ success: false, message: 'Error fetching classes' });
   }
 });
-router.post('/classes/register', async (req, res) => {
+  router.post('/registration', async (req, res) => {
   try {
     const { classId, name, email, phone, seats, notes } = req.body;
     const classItem = await Class.findById(classId);
