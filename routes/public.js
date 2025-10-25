@@ -43,7 +43,11 @@ router.get('/hours', async (req, res) => {
 router.get('/banners', async (req, res) => {
   try {
     const banners = await Banner.find({ isActive: true }).sort({ order: 1 });
-    res.json(banners);
+    const mappedBanners = banners.map(banner => ({
+      ...banner.toObject(),
+      id: banner._id.toString()
+    }));
+    res.json(mappedBanners);
   } catch (error) {
     console.error('Error fetching banners:', error);
     res.status(500).json({ 
