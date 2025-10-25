@@ -5,6 +5,7 @@ const Settings = require('../models/Settings');
 const Hours = require('../models/Hours');
 const Banner = require('../models/Banner');
 const Class = require('../models/Class');
+const Registration = require('../models/Registration');
 
 // Apply auth middleware to all admin routes
 router.use(authMiddleware);
@@ -274,6 +275,76 @@ router.delete('/classes/:id', async (req, res) => {
     res.status(500).json({ 
       success: false,
       error: error.message || 'Error deleting class' 
+    });
+  }
+});
+
+// ========== REGISTRATIONS ==========
+
+// GET /api/admin/registrations
+router.get('/registrations', async (req, res) => {
+  try {
+    const registrations = await Registration.find()
+      .populate('classId')
+      .sort({ createdAt: -1 });
+    res.json({ success: true, data: registrations });
+  } catch (error) {
+    console.error('Error fetching registrations:', error);
+    res.status(500).json({ 
+      success: false,
+      error: error.message || 'Error fetching registrations' 
+    });
+  }
+});
+
+// PUT /api/admin/registrations/:id/status
+router.put('/registrations/:id/status', async (req, res) => {
+  try {
+    const { status } = req.body;
+    const registration = await Registration.findByIdAndUpdate(
+      req.params.id,
+      { status },
+      { new: true }
+    );
+    
+    if (!registration) {
+      return res.status(404).json({ 
+        success: false,
+        error: 'Registration not found' 
+      });
+    }
+    
+    res.json({ success: true, data: registration });
+  } catch (error) {
+    console.error('Error updating registration:', error);
+    res.status(500).json({ 
+      success: false,
+      error: error.message || 'Error updating registration' 
+    });
+  }
+});
+
+// DELETE /api/admin/registrations/:id
+router.delete('/registrations/:id', async (req, res) => {
+  try {
+    const registration = await Registration.findByIdAndDelete(req.params.id);
+    
+    if (!registration) {
+      return res.status(404).json({ 
+        success: false,
+        error: 'Registration not found' 
+      });
+    }
+    
+    res.json({ 
+      success: true,
+      message: 'Registration deleted successfully' 
+    });
+  } catch (error) {
+    console.error('Error deleting registration:', error);
+    res.status(500).json({ 
+      success: false,
+      error: error.message || 'Error deleting registration' 
     });
   }
 });
