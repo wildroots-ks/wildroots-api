@@ -27,12 +27,12 @@ router.put('/settings', async (req, res) => {
       settings = await Settings.findOneAndUpdate({}, req.body, { new: true });
     }
     
-    res.json(settings);
+    res.json({ success: true, data: settings });
   } catch (error) {
     console.error('Error updating settings:', error);
     res.status(500).json({ 
       success: false,
-      message: 'Error updating settings' 
+      error: error.message || 'Error updating settings' 
     });
   }
 });
@@ -43,12 +43,12 @@ router.put('/settings', async (req, res) => {
 router.get('/hours', async (req, res) => {
   try {
     const hours = await Hours.find().sort({ dayOfWeek: 1 });
-    res.json(hours);
+    res.json({ success: true, data: hours });
   } catch (error) {
     console.error('Error fetching hours:', error);
     res.status(500).json({ 
       success: false,
-      message: 'Error fetching hours' 
+      error: error.message || 'Error fetching hours' 
     });
   }
 });
@@ -57,12 +57,12 @@ router.get('/hours', async (req, res) => {
 router.post('/hours', async (req, res) => {
   try {
     const hours = await Hours.create(req.body);
-    res.status(201).json(hours);
+    res.status(201).json({ success: true, data: hours });
   } catch (error) {
     console.error('Error creating hours:', error);
     res.status(500).json({ 
       success: false,
-      message: 'Error creating hours' 
+      error: error.message || 'Error creating hours' 
     });
   }
 });
@@ -75,16 +75,16 @@ router.put('/hours/:id', async (req, res) => {
     if (!hours) {
       return res.status(404).json({ 
         success: false,
-        message: 'Hours not found' 
+        error: 'Hours not found' 
       });
     }
     
-    res.json(hours);
+    res.json({ success: true, data: hours });
   } catch (error) {
     console.error('Error updating hours:', error);
     res.status(500).json({ 
       success: false,
-      message: 'Error updating hours' 
+      error: error.message || 'Error updating hours' 
     });
   }
 });
@@ -97,7 +97,7 @@ router.delete('/hours/:id', async (req, res) => {
     if (!hours) {
       return res.status(404).json({ 
         success: false,
-        message: 'Hours not found' 
+        error: 'Hours not found' 
       });
     }
     
@@ -109,7 +109,7 @@ router.delete('/hours/:id', async (req, res) => {
     console.error('Error deleting hours:', error);
     res.status(500).json({ 
       success: false,
-      message: 'Error deleting hours' 
+      error: error.message || 'Error deleting hours' 
     });
   }
 });
@@ -120,12 +120,12 @@ router.delete('/hours/:id', async (req, res) => {
 router.get('/banners', async (req, res) => {
   try {
     const banners = await Banner.find().sort({ order: 1 });
-    res.json(banners);
+    res.json({ success: true, data: banners });
   } catch (error) {
     console.error('Error fetching banners:', error);
     res.status(500).json({ 
       success: false,
-      message: 'Error fetching banners' 
+      error: error.message || 'Error fetching banners' 
     });
   }
 });
@@ -134,12 +134,12 @@ router.get('/banners', async (req, res) => {
 router.post('/banners', async (req, res) => {
   try {
     const banner = await Banner.create(req.body);
-    res.status(201).json(banner);
+    res.status(201).json({ success: true, data: banner });
   } catch (error) {
     console.error('Error creating banner:', error);
     res.status(500).json({ 
       success: false,
-      message: 'Error creating banner' 
+      error: error.message || 'Error creating banner' 
     });
   }
 });
@@ -152,16 +152,16 @@ router.put('/banners/:id', async (req, res) => {
     if (!banner) {
       return res.status(404).json({ 
         success: false,
-        message: 'Banner not found' 
+        error: 'Banner not found' 
       });
     }
     
-    res.json(banner);
+    res.json({ success: true, data: banner });
   } catch (error) {
     console.error('Error updating banner:', error);
     res.status(500).json({ 
       success: false,
-      message: 'Error updating banner' 
+      error: error.message || 'Error updating banner' 
     });
   }
 });
@@ -174,7 +174,7 @@ router.delete('/banners/:id', async (req, res) => {
     if (!banner) {
       return res.status(404).json({ 
         success: false,
-        message: 'Banner not found' 
+        error: 'Banner not found' 
       });
     }
     
@@ -186,7 +186,7 @@ router.delete('/banners/:id', async (req, res) => {
     console.error('Error deleting banner:', error);
     res.status(500).json({ 
       success: false,
-      message: 'Error deleting banner' 
+      error: error.message || 'Error deleting banner' 
     });
   }
 });
@@ -197,12 +197,12 @@ router.delete('/banners/:id', async (req, res) => {
 router.get('/classes', async (req, res) => {
   try {
     const classes = await Class.find().sort({ date: 1 });
-    res.json(classes);
+    res.json({ success: true, data: classes });
   } catch (error) {
     console.error('Error fetching classes:', error);
     res.status(500).json({ 
       success: false,
-      message: 'Error fetching classes' 
+      error: error.message || 'Error fetching classes' 
     });
   }
 });
@@ -211,12 +211,12 @@ router.get('/classes', async (req, res) => {
 router.post('/classes', async (req, res) => {
   try {
     const classItem = await Class.create(req.body);
-    res.status(201).json(classItem);
+    res.status(201).json({ success: true, data: classItem });
   } catch (error) {
     console.error('Error creating class:', error);
     res.status(500).json({ 
       success: false,
-      message: 'Error creating class' 
+      error: error.message || 'Error creating class' 
     });
   }
 });
@@ -229,16 +229,16 @@ router.put('/classes/:id', async (req, res) => {
     if (!classItem) {
       return res.status(404).json({ 
         success: false,
-        message: 'Class not found' 
+        error: 'Class not found' 
       });
     }
     
-    res.json(classItem);
+    res.json({ success: true, data: classItem });
   } catch (error) {
     console.error('Error updating class:', error);
     res.status(500).json({ 
       success: false,
-      message: 'Error updating class' 
+      error: error.message || 'Error updating class' 
     });
   }
 });
@@ -251,7 +251,7 @@ router.delete('/classes/:id', async (req, res) => {
     if (!classItem) {
       return res.status(404).json({ 
         success: false,
-        message: 'Class not found' 
+        error: 'Class not found' 
       });
     }
     
@@ -263,7 +263,7 @@ router.delete('/classes/:id', async (req, res) => {
     console.error('Error deleting class:', error);
     res.status(500).json({ 
       success: false,
-      message: 'Error deleting class' 
+      error: error.message || 'Error deleting class' 
     });
   }
 });
