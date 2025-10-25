@@ -112,6 +112,9 @@ router.post('/contact', async (req, res) => {
     res.status(500).json({ success: false, message: 'Error processing contact form' });
   }
 });
+router.post('/test-registration', async (req, res) => {
+  res.json({ success: true, message: 'Test route works!' });
+});
 
 // POST /api/public/classes/register
 
