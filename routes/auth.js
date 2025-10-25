@@ -4,6 +4,43 @@ const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
 const AdminUser = require('../models/AdminUser');
 
+// Authentication middleware
+const authMiddleware = async (req, res, next) => {
+  try {
+    const authHeader = req.headers.authorization;
+    
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ 
+        success: false,
+        message: 'No token provided' 
+      });
+    }
+
+    const token = authHeader.split(' ')[1];
+    
+    // Verify token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    
+    // Find user
+    const user = await AdminUser.findById(decoded.id).select('-password');
+    if (!user) {
+      return res.status(401).json({ 
+        success: false,
+        message: 'Invalid token' 
+      });
+    }
+
+    req.user = user;
+    next();
+  } catch (error) {
+    console.error('Auth middleware error:', error);
+    return res.status(401).json({ 
+      success: false,
+      message: 'Invalid token' 
+    });
+  }
+};
+
 // POST /api/auth/login
 router.post('/login', [
   body('email').isEmail().withMessage('Please enter a valid email'),
@@ -59,6 +96,27 @@ router.post('/login', [
     });
   } catch (error) {
     console.error('Login error:', error);
+    res.status(500).json({ 
+      success: false,
+      message: 'Server error' 
+    });
+  }
+});
+
+// GET /api/auth/me - Verify token and get current user
+router.get('/me', authMiddleware, async (req, res) => {
+  try {
+    res.json({
+      success: true,
+      user: {
+        id: req.user._id,
+        name: req.user.name,
+        email: req.user.email,
+        role: req.user.role
+      }
+    });
+  } catch (error) {
+    console.error('Get user error:', error);
     res.status(500).json({ 
       success: false,
       message: 'Server error' 
