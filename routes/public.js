@@ -10,19 +10,13 @@ const Registration = require('../models/Registration');
 router.get('/settings', async (req, res) => {
   try {
     let settings = await Settings.findOne();
-    
-    // If no settings exist, create default
     if (!settings) {
       settings = await Settings.create({});
     }
-    
     res.json({ success: true, data: settings });
   } catch (error) {
     console.error('Error fetching settings:', error);
-    res.status(500).json({ 
-      success: false,
-      message: 'Error fetching settings' 
-    });
+    res.status(500).json({ success: false, message: 'Error fetching settings' });
   }
 });
 
@@ -33,10 +27,7 @@ router.get('/hours', async (req, res) => {
     res.json({ success: true, data: hours });
   } catch (error) {
     console.error('Error fetching hours:', error);
-    res.status(500).json({ 
-      success: false,
-      message: 'Error fetching hours' 
-    });
+    res.status(500).json({ success: false, message: 'Error fetching hours' });
   }
 });
 
@@ -51,10 +42,7 @@ router.get('/banners', async (req, res) => {
     res.json({ success: true, data: mappedBanners });
   } catch (error) {
     console.error('Error fetching banners:', error);
-    res.status(500).json({ 
-      success: false,
-      message: 'Error fetching banners' 
-    });
+    res.status(500).json({ success: false, message: 'Error fetching banners' });
   }
 });
 
@@ -65,10 +53,7 @@ router.get('/classes', async (req, res) => {
     res.json({ success: true, data: classes });
   } catch (error) {
     console.error('Error fetching classes:', error);
-    res.status(500).json({ 
-      success: false,
-      message: 'Error fetching classes' 
-    });
+    res.status(500).json({ success: false, message: 'Error fetching classes' });
   }
 });
 
@@ -76,21 +61,13 @@ router.get('/classes', async (req, res) => {
 router.get('/classes/:slug', async (req, res) => {
   try {
     const classItem = await Class.findOne({ slug: req.params.slug, isActive: true });
-    
     if (!classItem) {
-      return res.status(404).json({ 
-        success: false,
-        message: 'Class not found' 
-      });
+      return res.status(404).json({ success: false, message: 'Class not found' });
     }
-    
     res.json({ success: true, data: classItem });
   } catch (error) {
     console.error('Error fetching class:', error);
-    res.status(500).json({ 
-      success: false,
-      message: 'Error fetching class' 
-    });
+    res.status(500).json({ success: false, message: 'Error fetching class' });
   }
 });
 
@@ -98,28 +75,14 @@ router.get('/classes/:slug', async (req, res) => {
 router.post('/contact', async (req, res) => {
   try {
     const { name, email, phone, subject, message, honeypot } = req.body;
-    
-    // Honeypot spam check
     if (honeypot) {
-      return res.status(400).json({ 
-        success: false,
-        message: 'Invalid submission' 
-      });
+      return res.status(400).json({ success: false, message: 'Invalid submission' });
     }
-    
-    // Here you would typically send an email or save to database
     console.log('Contact form submission:', { name, email, phone, subject, message });
-    
-    res.json({ 
-      success: true,
-      message: 'Message received! We will get back to you soon.' 
-    });
+    res.json({ success: true, message: 'Message received! We will get back to you soon.' });
   } catch (error) {
     console.error('Error processing contact form:', error);
-    res.status(500).json({ 
-      success: false,
-      message: 'Error processing contact form' 
-    });
+    res.status(500).json({ success: false, message: 'Error processing contact form' });
   }
 });
 
@@ -127,22 +90,10 @@ router.post('/contact', async (req, res) => {
 router.post('/classes/register', async (req, res) => {
   try {
     const { classId, name, email, phone, seats, notes } = req.body;
-    
-    // Get the class details
     const classItem = await Class.findById(classId);
     if (!classItem) {
-      return res.status(404).json({ 
-        success: false,
-        error: 'Class not found' 
-      });
+      return res.status(404).json({ success: false, error: 'Class not found' });
     }
-    
-
-
-    // POST /api/public/classes/register
-    router.post('/classes/register', async (req, res) => {
-    
-    // Save the registration
     const registration = await Registration.create({
       classId,
       className: classItem.title,
@@ -153,9 +104,7 @@ router.post('/classes/register', async (req, res) => {
       seats: seats || 1,
       notes: notes || ''
     });
-    
     console.log('Class registration saved:', registration);
-    
     res.json({ 
       success: true,
       message: 'Registration successful! We will contact you to confirm.',
@@ -163,10 +112,7 @@ router.post('/classes/register', async (req, res) => {
     });
   } catch (error) {
     console.error('Error processing registration:', error);
-    res.status(500).json({ 
-      success: false,
-      error: error.message || 'Error processing registration' 
-    });
+    res.status(500).json({ success: false, error: error.message || 'Error processing registration' });
   }
 });
 
