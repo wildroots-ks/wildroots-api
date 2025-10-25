@@ -5,6 +5,7 @@ const Class = require('../models/Class');
 console.log('🔥 Registrations route file loaded');
 
 router.post('/', async (req, res) => {
+  console.log('🎯 POST route HIT!', req.body);
   try {
     const { classId, name, email, phone, seats, notes } = req.body;
     
