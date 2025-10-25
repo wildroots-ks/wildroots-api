@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Registration = require('../models/Registration');
 const Class = require('../models/Class');
+console.log('🔥 Registrations route file loaded');
 
 router.post('/', async (req, res) => {
   try {
