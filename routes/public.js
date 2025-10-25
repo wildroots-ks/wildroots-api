@@ -5,7 +5,7 @@ const Hours = require('../models/Hours');
 const Banner = require('../models/Banner');
 const Class = require('../models/Class');
 const Registration = require('../models/Registration');
-
+console.log('✅ Registration model loaded:', !!Registration);
 // GET /api/public/settings
 router.get('/settings', async (req, res) => {
   try {
