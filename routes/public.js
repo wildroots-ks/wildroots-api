@@ -15,7 +15,7 @@ router.get('/settings', async (req, res) => {
       settings = await Settings.create({});
     }
     
-    res.json(settings);
+    res.json({ success: true, data: settings });
   } catch (error) {
     console.error('Error fetching settings:', error);
     res.status(500).json({ 
@@ -29,7 +29,7 @@ router.get('/settings', async (req, res) => {
 router.get('/hours', async (req, res) => {
   try {
     const hours = await Hours.find().sort({ dayOfWeek: 1 });
-    res.json(hours);
+    res.json({ success: true, data: hours });
   } catch (error) {
     console.error('Error fetching hours:', error);
     res.status(500).json({ 
@@ -47,7 +47,7 @@ router.get('/banners', async (req, res) => {
       ...banner.toObject(),
       id: banner._id.toString()
     }));
-    res.json(mappedBanners);
+    res.json({ success: true, data: mappedBanners });
   } catch (error) {
     console.error('Error fetching banners:', error);
     res.status(500).json({ 
@@ -61,7 +61,7 @@ router.get('/banners', async (req, res) => {
 router.get('/classes', async (req, res) => {
   try {
     const classes = await Class.find({ isActive: true }).sort({ date: 1 });
-    res.json(classes);
+    res.json({ success: true, data: classes });
   } catch (error) {
     console.error('Error fetching classes:', error);
     res.status(500).json({ 
@@ -83,7 +83,7 @@ router.get('/classes/:slug', async (req, res) => {
       });
     }
     
-    res.json(classItem);
+    res.json({ success: true, data: classItem });
   } catch (error) {
     console.error('Error fetching class:', error);
     res.status(500).json({ 
