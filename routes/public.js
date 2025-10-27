@@ -56,7 +56,9 @@ router.get('/classes', async (req, res) => {
     res.status(500).json({ success: false, message: 'Error fetching classes' });
   }
 });
-  router.post('/registration', async (req, res) => {
+
+// POST /api/public/classes/register
+router.post('/classes/register', async (req, res) => {
   try {
     const { classId, name, email, phone, seats, notes } = req.body;
     const classItem = await Class.findById(classId);
@@ -84,6 +86,7 @@ router.get('/classes', async (req, res) => {
     res.status(500).json({ success: false, error: error.message || 'Error processing registration' });
   }
 });
+
 // GET /api/public/classes/:slug
 router.get('/classes/:slug', async (req, res) => {
   try {
@@ -112,11 +115,5 @@ router.post('/contact', async (req, res) => {
     res.status(500).json({ success: false, message: 'Error processing contact form' });
   }
 });
-router.post('/test-registration', async (req, res) => {
-  res.json({ success: true, message: 'Test route works!' });
-});
-
-// POST /api/public/classes/register
-
 
 module.exports = router;
