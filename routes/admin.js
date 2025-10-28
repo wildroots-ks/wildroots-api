@@ -202,7 +202,11 @@ router.delete('/banners/:id', async (req, res) => {
 router.get('/classes', async (req, res) => {
   try {
     const classes = await Class.find().sort({ date: 1 });
-    res.json({ success: true, data: classes });
+    const mappedClasses = classes.map(classItem => ({
+      ...classItem.toObject(),
+      id: classItem._id.toString()
+    }));
+    res.json({ success: true, data: mappedClasses });
   } catch (error) {
     console.error('Error fetching classes:', error);
     res.status(500).json({ 
