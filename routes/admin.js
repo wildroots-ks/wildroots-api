@@ -57,6 +57,21 @@ router.get('/hours', async (req, res) => {
 // POST /api/admin/hours
 router.post('/hours', async (req, res) => {
   try {
+    // Check for duplicate day of week (for regular hours)
+    if (!req.body.isSpecial && req.body.dayOfWeek) {
+      const existing = await Hours.findOne({
+        dayOfWeek: req.body.dayOfWeek,
+        isSpecial: false
+      });
+      
+      if (existing) {
+        return res.status(400).json({
+          success: false,
+          error: `Hours for ${req.body.dayOfWeek} already exist. Please edit the existing entry.`
+        });
+      }
+    }
+    
     const hours = await Hours.create(req.body);
     res.status(201).json({ success: true, data: hours });
   } catch (error) {
@@ -71,6 +86,9 @@ router.post('/hours', async (req, res) => {
 // PUT /api/admin/hours/:id
 router.put('/hours/:id', async (req, res) => {
   try {
+    console.log('UPDATE Hours - ID:', req.params.id);
+    console.log('UPDATE Hours - Body:', req.body);
+    
     const hours = await Hours.findByIdAndUpdate(req.params.id, req.body, { new: true });
     
     if (!hours) {
@@ -80,9 +98,11 @@ router.put('/hours/:id', async (req, res) => {
       });
     }
     
+    console.log('UPDATE Hours - Success:', hours);
     res.json({ success: true, data: hours });
   } catch (error) {
     console.error('Error updating hours:', error);
+    console.error('Error stack:', error.stack);
     res.status(500).json({ 
       success: false,
       error: error.message || 'Error updating hours' 
@@ -93,21 +113,35 @@ router.put('/hours/:id', async (req, res) => {
 // DELETE /api/admin/hours/:id
 router.delete('/hours/:id', async (req, res) => {
   try {
+    console.log('DELETE Hours - ID received:', req.params.id);
+    
+    // Validate MongoDB ObjectId format
+    if (!req.params.id || !req.params.id.match(/^[0-9a-fA-F]{24}$/)) {
+      console.log('Invalid ID format');
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid ID format'
+      });
+    }
+    
     const hours = await Hours.findByIdAndDelete(req.params.id);
     
     if (!hours) {
+      console.log('Hours not found for ID:', req.params.id);
       return res.status(404).json({ 
         success: false,
         error: 'Hours not found' 
       });
     }
     
+    console.log('DELETE Hours - Success');
     res.json({ 
       success: true,
       message: 'Hours deleted successfully' 
     });
   } catch (error) {
     console.error('Error deleting hours:', error);
+    console.error('Error stack:', error.stack);
     res.status(500).json({ 
       success: false,
       error: error.message || 'Error deleting hours' 
