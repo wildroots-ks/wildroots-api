@@ -40,11 +40,19 @@ router.put('/settings', async (req, res) => {
 
 // ========== HOURS ==========
 
+
 // GET /api/admin/hours
 router.get('/hours', async (req, res) => {
   try {
-    const hours = await Hours.find().sort({ dayOfWeek: 1 });
-    res.json({ success: true, data: hours });
+    const hours = await Hours.find();
+    const dayOrder = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    const sortedHours = hours.sort((a, b) => {
+      if (a.isSpecial && !b.isSpecial) return 1;
+      if (!a.isSpecial && b.isSpecial) return -1;
+      if (a.isSpecial && b.isSpecial) return 0;
+      return dayOrder.indexOf(a.dayOfWeek) - dayOrder.indexOf(b.dayOfWeek);
+    });
+    res.json({ success: true, data: sortedHours });
   } catch (error) {
     console.error('Error fetching hours:', error);
     res.status(500).json({ 
