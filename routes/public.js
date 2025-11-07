@@ -122,7 +122,7 @@ router.post('/contact', async (req, res) => {
     // Send email via Resend
     const emailResult = await resend.emails.send({
       from: 'Wild Roots Garden & Gifts <onboarding@resend.dev>',
-      to: 'to: 'goodlandwildroots@gmail.com',',
+     to: 'goodlandwildroots@gmail.com',
       subject: `Contact Form: ${subject}`,
       html: `
         <h2>New Contact Form Submission</h2>
