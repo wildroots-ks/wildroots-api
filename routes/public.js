@@ -5,7 +5,13 @@ const Hours = require('../models/Hours');
 const Banner = require('../models/Banner');
 const Class = require('../models/Class');
 const Registration = require('../models/Registration');
+const { Resend } = require('resend');
+
 console.log('✅ Registration model loaded:', !!Registration);
+
+// Initialize Resend
+const resend = new Resend(process.env.RESEND_API_KEY);
+
 // GET /api/public/settings
 router.get('/settings', async (req, res) => {
   try {
@@ -105,14 +111,43 @@ router.get('/classes/:slug', async (req, res) => {
 router.post('/contact', async (req, res) => {
   try {
     const { name, email, phone, subject, message, honeypot } = req.body;
+    
+    // Honeypot spam check
     if (honeypot) {
       return res.status(400).json({ success: false, message: 'Invalid submission' });
     }
+    
     console.log('Contact form submission:', { name, email, phone, subject, message });
-    res.json({ success: true, message: 'Message received! We will get back to you soon.' });
+    
+    // Send email via Resend
+    const emailResult = await resend.emails.send({
+      from: 'Wild Roots Garden & Gifts <onboarding@resend.dev>',
+      to: 'jody.abby.wildroots@gmail.com',
+      subject: `Contact Form: ${subject}`,
+      html: `
+        <h2>New Contact Form Submission</h2>
+        <p><strong>From:</strong> ${name}</p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Phone:</strong> ${phone || 'Not provided'}</p>
+        <p><strong>Subject:</strong> ${subject}</p>
+        <hr>
+        <p><strong>Message:</strong></p>
+        <p>${message}</p>
+      `
+    });
+    
+    console.log('Email sent successfully:', emailResult);
+    
+    res.json({ 
+      success: true, 
+      message: 'Message received! We will get back to you soon.' 
+    });
   } catch (error) {
     console.error('Error processing contact form:', error);
-    res.status(500).json({ success: false, message: 'Error processing contact form' });
+    res.status(500).json({ 
+      success: false, 
+      message: 'Error processing contact form' 
+    });
   }
 });
 
