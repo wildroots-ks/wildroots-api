@@ -394,5 +394,102 @@ router.delete('/registrations/:id', async (req, res) => {
     });
   }
 });
+// ========== PAGE CONTENT ==========
 
+// GET /api/admin/page-content?page=home
+router.get('/page-content', async (req, res) => {
+  try {
+    const { page } = req.query;
+    const PageContent = require('../models/PageContent');
+    const contents = await PageContent.find({ page }).sort({ order: 1 });
+    res.json({ success: true, data: contents });
+  } catch (error) {
+    console.error('Error fetching page content:', error);
+    res.status(500).json({ 
+      success: false,
+      error: error.message || 'Error fetching page content' 
+    });
+  }
+});
+
+// POST /api/admin/page-content
+router.post('/page-content', async (req, res) => {
+  try {
+    const PageContent = require('../models/PageContent');
+    const content = await PageContent.create(req.body);
+    res.status(201).json({ success: true, data: content });
+  } catch (error) {
+    console.error('Error creating page content:', error);
+    res.status(500).json({ 
+      success: false,
+      error: error.message || 'Error creating page content' 
+    });
+  }
+});
+
+// PUT /api/admin/page-content/:id
+router.put('/page-content/:id', async (req, res) => {
+  try {
+    const PageContent = require('../models/PageContent');
+    const content = await PageContent.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    
+    if (!content) {
+      return res.status(404).json({ 
+        success: false,
+        error: 'Content not found' 
+      });
+    }
+    
+    res.json({ success: true, data: content });
+  } catch (error) {
+    console.error('Error updating page content:', error);
+    res.status(500).json({ 
+      success: false,
+      error: error.message || 'Error updating page content' 
+    });
+  }
+});
+
+// DELETE /api/admin/page-content/:id
+router.delete('/page-content/:id', async (req, res) => {
+  try {
+    const PageContent = require('../models/PageContent');
+    const content = await PageContent.findByIdAndDelete(req.params.id);
+    
+    if (!content) {
+      return res.status(404).json({ 
+        success: false,
+        error: 'Content not found' 
+      });
+    }
+    
+    res.json({ 
+      success: true,
+      message: 'Content deleted successfully' 
+    });
+  } catch (error) {
+    console.error('Error deleting page content:', error);
+    res.status(500).json({ 
+      success: false,
+      error: error.message || 'Error deleting page content' 
+    });
+  }
+});
+
+// POST /api/admin/upload-image
+router.post('/upload-image', async (req, res) => {
+  try {
+    // For now, return a placeholder. You'll need to set up Cloudinary or similar
+    res.json({ 
+      success: true, 
+      data: { url: 'https://via.placeholder.com/800x600' } 
+    });
+  } catch (error) {
+    console.error('Error uploading image:', error);
+    res.status(500).json({ 
+      success: false,
+      error: error.message || 'Error uploading image' 
+    });
+  }
+});
 module.exports = router;
