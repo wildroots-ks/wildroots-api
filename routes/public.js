@@ -5,6 +5,7 @@ const Hours = require('../models/Hours');
 const Banner = require('../models/Banner');
 const Class = require('../models/Class');
 const Registration = require('../models/Registration');
+const PageContent = require('../models/PageContent');
 const { Resend } = require('resend');
 
 console.log('✅ Registration model loaded:', !!Registration);
@@ -60,6 +61,25 @@ router.get('/classes', async (req, res) => {
   } catch (error) {
     console.error('Error fetching classes:', error);
     res.status(500).json({ success: false, message: 'Error fetching classes' });
+  }
+});
+
+// GET /api/public/page-content
+router.get('/page-content', async (req, res) => {
+  try {
+    const { page } = req.query;
+    if (!page) {
+      return res.status(400).json({ success: false, message: 'Page parameter required' });
+    }
+    const content = await PageContent.find({ page }).sort({ order: 1 });
+    const mappedContent = content.map(item => ({
+      ...item.toObject(),
+      id: item._id.toString()
+    }));
+    res.json({ success: true, data: mappedContent });
+  } catch (error) {
+    console.error('Error fetching page content:', error);
+    res.status(500).json({ success: false, message: 'Error fetching page content' });
   }
 });
 
