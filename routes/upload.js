@@ -1,35 +1,46 @@
-import { uploadImage } from '@/lib/api';
-<div>
-  <label className="block text-sm font-medium text-gray-700 mb-2">
-    Image URL (optional)
-  </label>
-  <div className="space-y-2">
-    <input
-      type="text"
-      value={formData.imageUrl}
-      onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
-      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sage-500"
-      placeholder="https://example.com/image.jpg or /uploads/filename.jpg"
-    />
-    <div className="flex items-center gap-2">
-      <input
-        type="file"
-        accept="image/*"
-        onChange={async (e) => {
-          const file = e.target.files?.[0];
-          if (file) {
-            try {
-              const result = await uploadImage(file);
-              setFormData({ ...formData, imageUrl: result.imageUrl });
-              alert('Image uploaded successfully!');
-            } catch (error) {
-              alert('Upload failed: ' + error);
-            }
-          }
-        }}
-        className="text-sm"
-      />
-      <span className="text-xs text-gray-500">Max 5MB</span>
-    </div>
-  </div>
-</div>
+const express = require('express');
+const router = express.Router();
+const multer = require('multer');
+const path = require('path');
+
+// Configure multer for image uploads
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/');
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, uniqueSuffix + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({
+  storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = /jpeg|jpg|png|gif|webp/;
+    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = allowedTypes.test(file.mimetype);
+    if (extname && mimetype) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only image files are allowed'));
+    }
+  }
+});
+
+// POST /api/upload - Upload single image
+router.post('/', upload.single('image'), (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: 'No file uploaded' });
+    }
+    const imageUrl = `/uploads/${req.file.filename}`;
+    res.json({ success: true, imageUrl });
+  } catch (error) {
+    console.error('Upload error:', error);
+    res.status(500).json({ success: false, message: 'Upload failed' });
+  }
+});
+
+module.exports = router;
