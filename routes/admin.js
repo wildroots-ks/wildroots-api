@@ -261,6 +261,12 @@ router.get('/classes', async (req, res) => {
 // POST /api/admin/classes
 router.post('/classes', async (req, res) => {
   try {
+    // Parse date in Central Time to prevent timezone shift
+    if (req.body.date) {
+      const [year, month, day] = req.body.date.split('-').map(Number);
+      req.body.date = new Date(year, month - 1, day, 12, 0, 0); // Noon Central Time
+    }
+    
     const classItem = await Class.create(req.body);
     res.status(201).json({ success: true, data: classItem });
   } catch (error) {
@@ -275,6 +281,12 @@ router.post('/classes', async (req, res) => {
 // PUT /api/admin/classes/:id
 router.put('/classes/:id', async (req, res) => {
   try {
+    // Parse date in Central Time to prevent timezone shift
+    if (req.body.date) {
+      const [year, month, day] = req.body.date.split('-').map(Number);
+      req.body.date = new Date(year, month - 1, day, 12, 0, 0); // Noon Central Time
+    }
+    
     // If slug hasn't changed, remove it from update to avoid duplicate key error
     const existingClass = await Class.findById(req.params.id);
     if (existingClass && existingClass.slug === req.body.slug) {
