@@ -17,13 +17,22 @@ app.use(cors({
     'http://localhost:5173',
     process.env.FRONTEND_URL
   ].filter(Boolean),
-  credentials: true
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
+
+// Optional: Log incoming requests for debug (remove in production)
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.path} from ${req.get('Origin')}`);
+  next();
+});
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Serve uploaded images
-
+// TODO: Add static serving if needed, e.g., app.use('/uploads', express.static('uploads'));
 
 // Routes
 app.use('/api/public', require('./routes/public'));
