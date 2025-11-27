@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const cloudinary = require('cloudinary').v2;
-const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const auth = require('../middleware/auth');
 
 // Configure Cloudinary
@@ -12,80 +11,55 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-// Configure multer to use Cloudinary storage
-const storage = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: {
-    folder: 'wildroots',
-    allowed_formats: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
-    transformation: [{ width: 2000, height: 2000, crop: 'limit' }]
-  }
-});
+// Use memory storage instead of CloudinaryStorage
+const storage = multer.memoryStorage();
 
 const upload = multer({
   storage: storage,
   limits: {
     fileSize: 5 * 1024 * 1024 // 5MB limit
+  },
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only images allowed'));
+    }
   }
 });
 
 // Upload single image
-router.post('/image', auth, upload.single('image'), (req, res) => {
+router.post('/image', auth, upload.single('image'), async (req, res) => {
   try {
-    console.log('🔥 Upload attempt - req.file:', req.file);
-    console.log('🔥 Cloudinary config:', { 
-      cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-      has_api_key: !!process.env.CLOUDINARY_API_KEY,
-      has_api_secret: !!process.env.CLOUDINARY_API_SECRET
-    });
+    console.log('Upload attempt - file received:', !!req.file);
     
     if (!req.file) {
       return res.status(400).json({ message: 'No file uploaded' });
     }
 
-    // Cloudinary URL is in req.file.path
+    // Convert buffer to base64
+    const b64 = Buffer.from(req.file.buffer).toString('base64');
+    const dataURI = `data:${req.file.mimetype};base64,${b64}`;
+
+    // Upload to Cloudinary
+    const result = await cloudinary.uploader.upload(dataURI, {
+      folder: 'wildroots',
+      resource_type: 'auto'
+    });
+
+    console.log('Cloudinary upload success:', result.secure_url);
+
     res.json({
       message: 'Image uploaded successfully',
-      imageUrl: req.file.path,
-      filename: req.file.filename
+      imageUrl: result.secure_url,
+      filename: result.public_id
     });
   } catch (error) {
     console.error('Upload error:', error);
-    res.status(500).json({ message: 'Upload failed', error: error.message });
-  }
-});
-
-// Get all images from Cloudinary
-router.get('/images', auth, async (req, res) => {
-  try {
-    const result = await cloudinary.api.resources({
-      type: 'upload',
-      prefix: 'wildroots/',
-      max_results: 100
+    res.status(500).json({ 
+      message: 'Upload failed', 
+      error: error.message 
     });
-
-    const images = result.resources.map(resource => ({
-      filename: resource.public_id,
-      url: resource.secure_url,
-      uploadedAt: resource.created_at
-    }));
-
-    res.json(images);
-  } catch (error) {
-    console.error('Fetch images error:', error);
-    res.status(500).json({ message: 'Failed to fetch images', error: error.message });
-  }
-});
-
-// Delete image from Cloudinary
-router.delete('/image/:publicId', auth, async (req, res) => {
-  try {
-    const publicId = req.params.publicId.replace(/_/g, '/'); // Convert back to folder structure
-    await cloudinary.uploader.destroy(publicId);
-    res.json({ message: 'Image deleted successfully' });
-  } catch (error) {
-    console.error('Delete error:', error);
-    res.status(500).json({ message: 'Delete failed', error: error.message });
   }
 });
 
