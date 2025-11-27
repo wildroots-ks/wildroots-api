@@ -1,45 +1,84 @@
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
-const path = require('path');
+const cloudinary = require('cloudinary').v2;
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const auth = require('../middleware/auth');
 
-// Configure multer for image uploads
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'uploads/');
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, uniqueSuffix + path.extname(file.originalname));
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
+
+// Configure multer to use Cloudinary storage
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'wildroots',
+    allowed_formats: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
+    transformation: [{ width: 2000, height: 2000, crop: 'limit' }]
   }
 });
 
 const upload = multer({
-  storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
-  fileFilter: (req, file, cb) => {
-    const allowedTypes = /jpeg|jpg|png|gif|webp/;
-    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-    const mimetype = allowedTypes.test(file.mimetype);
-    if (extname && mimetype) {
-      cb(null, true);
-    } else {
-      cb(new Error('Only image files are allowed'));
-    }
+  storage: storage,
+  limits: {
+    fileSize: 5 * 1024 * 1024 // 5MB limit
   }
 });
 
-// POST /api/upload - Upload single image
-router.post('/', upload.single('image'), (req, res) => {
+// Upload single image
+router.post('/image', auth, upload.single('image'), (req, res) => {
   try {
     if (!req.file) {
-      return res.status(400).json({ success: false, message: 'No file uploaded' });
+      return res.status(400).json({ message: 'No file uploaded' });
     }
-    const imageUrl = `/uploads/${req.file.filename}`;
-    res.json({ success: true, imageUrl });
+
+    // Cloudinary URL is in req.file.path
+    res.json({
+      message: 'Image uploaded successfully',
+      imageUrl: req.file.path,
+      filename: req.file.filename
+    });
   } catch (error) {
     console.error('Upload error:', error);
-    res.status(500).json({ success: false, message: 'Upload failed' });
+    res.status(500).json({ message: 'Upload failed', error: error.message });
+  }
+});
+
+// Get all images from Cloudinary
+router.get('/images', auth, async (req, res) => {
+  try {
+    const result = await cloudinary.api.resources({
+      type: 'upload',
+      prefix: 'wildroots/',
+      max_results: 100
+    });
+
+    const images = result.resources.map(resource => ({
+      filename: resource.public_id,
+      url: resource.secure_url,
+      uploadedAt: resource.created_at
+    }));
+
+    res.json(images);
+  } catch (error) {
+    console.error('Fetch images error:', error);
+    res.status(500).json({ message: 'Failed to fetch images', error: error.message });
+  }
+});
+
+// Delete image from Cloudinary
+router.delete('/image/:publicId', auth, async (req, res) => {
+  try {
+    const publicId = req.params.publicId.replace(/_/g, '/'); // Convert back to folder structure
+    await cloudinary.uploader.destroy(publicId);
+    res.json({ message: 'Image deleted successfully' });
+  } catch (error) {
+    console.error('Delete error:', error);
+    res.status(500).json({ message: 'Delete failed', error: error.message });
   }
 });
 

@@ -4,230 +4,141 @@ require('dotenv').config();
 const PageContent = require('../models/PageContent');
 
 const contentData = [
-  // HOME PAGE
+  // HOME PAGE - ACTUAL CONTENT
   {
     page: 'home',
     section: 'hero',
     contentType: 'hero',
-    content: 'Welcome to Wild Roots Garden & Gifts',
-    imageUrl: '/images/home-hero.jpg',
+    content: 'Welcome to Wild Roots',
+    imageUrl: 'https://i.imgur.com/ANrdcYk.png?w=1600&h=900&fit=crop',
     order: 1
   },
   {
     page: 'home',
     section: 'hero-subtitle',
     contentType: 'text',
-    content: 'Your local garden center and gift shop in Goodland, Kansas',
+    content: 'Where your garden dreams take root',
     order: 2
   },
   {
     page: 'home',
-    section: 'about-preview-title',
-    contentType: 'heading',
-    content: 'About Us',
+    section: 'hero-cta-text',
+    contentType: 'text',
+    content: 'Explore Our Classes',
     order: 3
   },
   {
     page: 'home',
-    section: 'about-preview-text',
-    contentType: 'text',
-    content: 'Wild Roots is your one-stop shop for all things garden and gifts in Goodland, Kansas.',
-    imageUrl: '/images/about-preview.jpg',
+    section: 'why-choose-title',
+    contentType: 'heading',
+    content: 'Why Choose Wild Roots?',
     order: 4
   },
   {
     page: 'home',
-    section: 'services-title',
-    contentType: 'heading',
-    content: 'What We Offer',
+    section: 'why-choose-subtitle',
+    contentType: 'text',
+    content: 'Your premier destination for plants, gardening supplies, and unique gifts',
     order: 5
   },
   {
     page: 'home',
-    section: 'services-list',
-    contentType: 'text',
-    content: 'Garden supplies and plants\nUnique gifts and home decor\nGardening classes and workshops\nExpert advice and consultation',
+    section: 'quality-plants-title',
+    contentType: 'heading',
+    content: 'Quality Plants',
     order: 6
   },
-
-  // ABOUT PAGE
   {
-    page: 'about',
-    section: 'hero',
-    contentType: 'hero',
-    content: 'About Wild Roots',
-    imageUrl: '/images/about-hero.jpg',
-    order: 1
-  },
-  {
-    page: 'about',
-    section: 'hero-subtitle',
+    page: 'home',
+    section: 'quality-plants-text',
     contentType: 'text',
-    content: 'Growing community through plants and gifts',
-    order: 2
+    content: 'Carefully selected plants and trees for Kansas climate',
+    order: 7
   },
   {
-    page: 'about',
-    section: 'story-title',
+    page: 'home',
+    section: 'unique-gifts-title',
     contentType: 'heading',
-    content: 'Our Story',
-    order: 3
+    content: 'Unique Gifts',
+    order: 8
   },
   {
-    page: 'about',
-    section: 'story-text',
+    page: 'home',
+    section: 'unique-gifts-text',
     contentType: 'text',
-    content: 'Wild Roots Garden & Gifts has been serving Goodland, Kansas with quality plants, garden supplies, and unique gifts.',
-    imageUrl: '/images/about-story.jpg',
-    order: 4
+    content: 'Curated selection of home and garden decor',
+    order: 9
   },
   {
-    page: 'about',
-    section: 'mission-title',
+    page: 'home',
+    section: 'expert-classes-title',
     contentType: 'heading',
-    content: 'Our Mission',
-    order: 5
+    content: 'Expert Classes',
+    order: 10
   },
   {
-    page: 'about',
-    section: 'mission-text',
+    page: 'home',
+    section: 'expert-classes-text',
     contentType: 'text',
-    content: 'To provide quality products, expert knowledge, and exceptional service to our community.',
-    order: 6
-  },
-
-  // CLASSES PAGE
-  {
-    page: 'classes',
-    section: 'hero',
-    contentType: 'hero',
-    content: 'Gardening Classes & Workshops',
-    imageUrl: '/images/classes-hero.jpg',
-    order: 1
+    content: 'Learn from experienced gardeners and designers',
+    order: 11
   },
   {
-    page: 'classes',
-    section: 'hero-subtitle',
-    contentType: 'text',
-    content: 'Learn from the experts at Wild Roots',
-    order: 2
-  },
-  {
-    page: 'classes',
-    section: 'intro',
-    contentType: 'text',
-    content: 'Join us for hands-on gardening classes and workshops. All skill levels welcome!',
-    order: 3
-  },
-
-  // HOURS PAGE
-  {
-    page: 'hours',
-    section: 'hero',
-    contentType: 'hero',
-    content: 'Store Hours & Location',
-    imageUrl: '/images/hours-hero.jpg',
-    order: 1
-  },
-  {
-    page: 'hours',
-    section: 'hero-subtitle',
-    contentType: 'text',
-    content: 'Visit us in Goodland, Kansas',
-    order: 2
-  },
-  {
-    page: 'hours',
-    section: 'location-title',
+    page: 'home',
+    section: 'local-trusted-title',
     contentType: 'heading',
-    content: 'Find Us',
-    order: 3
+    content: 'Local & Trusted',
+    order: 12
   },
   {
-    page: 'hours',
-    section: 'location-text',
+    page: 'home',
+    section: 'local-trusted-text',
     contentType: 'text',
-    content: 'Goodland, Kansas - Conveniently located in the heart of Goodland.',
-    order: 4
-  },
-
-  // SALES PAGE
-  {
-    page: 'sales',
-    section: 'hero',
-    contentType: 'hero',
-    content: 'Current Sales & Promotions',
-    imageUrl: '/images/sales-hero.jpg',
-    order: 1
+    content: 'Serving Goodland and surrounding communities',
+    order: 13
   },
   {
-    page: 'sales',
-    section: 'hero-subtitle',
-    contentType: 'text',
-    content: 'Save on plants, gifts, and garden supplies',
-    order: 2
-  },
-  {
-    page: 'sales',
-    section: 'intro',
-    contentType: 'text',
-    content: 'Check out our current sales and special offers. New deals added regularly!',
-    order: 3
-  },
-
-  // NEW (What's New) PAGE
-  {
-    page: 'new',
-    section: 'hero',
-    contentType: 'hero',
-    content: "What's New at Wild Roots",
-    imageUrl: '/images/whats-new-hero.jpg',
-    order: 1
-  },
-  {
-    page: 'new',
-    section: 'hero-subtitle',
-    contentType: 'text',
-    content: 'Latest arrivals and updates',
-    order: 2
-  },
-  {
-    page: 'new',
-    section: 'intro',
-    contentType: 'text',
-    content: 'Discover our newest plants, gifts, and products. Fresh inventory arriving weekly!',
-    order: 3
-  },
-
-  // CONTACT PAGE
-  {
-    page: 'contact',
-    section: 'hero',
-    contentType: 'hero',
-    content: 'Get In Touch',
-    imageUrl: '/images/contact-hero.jpg',
-    order: 1
-  },
-  {
-    page: 'contact',
-    section: 'hero-subtitle',
-    contentType: 'text',
-    content: "We'd love to hear from you",
-    order: 2
-  },
-  {
-    page: 'contact',
-    section: 'info-title',
+    page: 'home',
+    section: 'featured-classes-title',
     contentType: 'heading',
-    content: 'Contact Information',
-    order: 3
+    content: 'Featured Classes',
+    order: 14
   },
   {
-    page: 'contact',
-    section: 'info-text',
+    page: 'home',
+    section: 'featured-classes-subtitle',
     contentType: 'text',
-    content: 'Have questions? Reach out to us and we\'ll get back to you soon.\n\nPhone: (555) 123-4567\nEmail: info@wildrootsgoodlandks.com',
-    order: 4
+    content: 'Join us for hands-on learning experiences',
+    order: 15
+  },
+  {
+    page: 'home',
+    section: 'visit-us-title',
+    contentType: 'heading',
+    content: 'Visit Us Today',
+    order: 16
+  },
+  {
+    page: 'home',
+    section: 'visit-us-image',
+    contentType: 'image',
+    content: 'Garden center interior',
+    imageUrl: 'https://i.imgur.com/PKNCAYf.png',
+    order: 17
+  },
+  {
+    page: 'home',
+    section: 'come-see-us-title',
+    contentType: 'heading',
+    content: 'Come See Us',
+    order: 18
+  },
+  {
+    page: 'home',
+    section: 'come-see-us-text',
+    contentType: 'text',
+    content: "Whether you're a seasoned gardener or just starting out, our friendly staff is here to help you succeed. Visit us to browse our selection of plants, supplies, and gifts.",
+    order: 19
   }
 ];
 
@@ -241,16 +152,9 @@ async function migrateContent() {
     await PageContent.deleteMany({});
     console.log('✅ Cleared existing content');
 
-    console.log('📝 Inserting new content...');
+    console.log('📝 Inserting HOME page content...');
     const result = await PageContent.insertMany(contentData);
-    console.log(`✅ Inserted ${result.length} content sections`);
-
-    console.log('\n📊 Summary by page:');
-    const pages = ['home', 'about', 'classes', 'hours', 'sales', 'new', 'contact'];
-    for (const page of pages) {
-      const count = result.filter(r => r.page === page).length;
-      console.log(`   ${page}: ${count} sections`);
-    }
+    console.log(`✅ Inserted ${result.length} HOME page sections`);
 
     console.log('\n✅ Migration complete!');
     process.exit(0);
