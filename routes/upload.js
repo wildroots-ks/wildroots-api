@@ -32,6 +32,13 @@ const upload = multer({
 // Upload single image
 router.post('/image', auth, upload.single('image'), (req, res) => {
   try {
+    console.log('🔥 Upload attempt - req.file:', req.file);
+    console.log('🔥 Cloudinary config:', { 
+      cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+      has_api_key: !!process.env.CLOUDINARY_API_KEY,
+      has_api_secret: !!process.env.CLOUDINARY_API_SECRET
+    });
+    
     if (!req.file) {
       return res.status(400).json({ message: 'No file uploaded' });
     }
