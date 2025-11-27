@@ -487,21 +487,4 @@ router.delete('/page-content/:id', async (req, res) => {
     });
   }
 });
-
-// POST /api/admin/upload-image
-router.post('/upload-image', async (req, res) => {
-  try {
-    // For now, return a placeholder. You'll need to set up Cloudinary or similar
-    res.json({ 
-      success: true, 
-      data: { url: 'https://via.placeholder.com/800x600' } 
-    });
-  } catch (error) {
-    console.error('Error uploading image:', error);
-    res.status(500).json({ 
-      success: false,
-      error: error.message || 'Error uploading image' 
-    });
-  }
-});
 module.exports = router;
